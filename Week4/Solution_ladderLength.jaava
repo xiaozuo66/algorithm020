@@ -1,0 +1,64 @@
+//本题还有一些疑问点，暂时先五毒第一步，明天需要第二掌
+
+class Solution {
+    public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+        if(beginWord==null || endWord==null || wordList.size()==0 || !wordList.contains(endWord)){
+            return 0;
+        }
+
+        Set<String> wordSet = new HashSet<>(wordList);
+        wordSet.remove(beginWord);
+        
+        //初始化一个队列保存待遍历节点
+        Queue<String> deque=new LinkedList();
+        deque.offer(beginWord);
+        //初始化一个set保存已遍历的节点，防止一个节点重复遍历
+        Set<String> visiter=new HashSet();
+        visiter.add(beginWord);
+
+        //开始遍历队列
+        int counter=1;
+        while(!deque.isEmpty()){
+            int size=deque.size();//保存此时的size，因为要与后面新加进来的节点共用一个队列
+            for(int i=0;i<size;i++){
+                String temp=deque.poll();
+                if(recursion(temp,endWord,wordSet,deque,visiter)){
+                    //找到了，返回
+                    return counter+1;
+                }
+            }
+            //在本层节点中没有找到匹配的单词，匹配次数+1
+            counter++;
+        }
+        return 0;
+    }
+
+    private boolean recursion(String beginWord,String endWord,Set<String> wordSet,Queue<String> deque,Set<String> visiter){
+        char [] temp=beginWord.toCharArray();
+        for(int i=0;i<temp.length;i++){
+            char bak=temp[i];
+            //使用26个字母依次就行替换(注意char类型操作字母的用法)
+            for(char c='a';c<='z';c++){
+                if(c==temp[i]){//与原字母一致，跳过
+                    continue;
+                }
+
+                temp[i]=c;//替换
+                String newWord=String.valueOf(temp);
+                if(wordSet.contains(newWord)){
+                    if(newWord.equals(endWord)){
+                        return true;
+                    }
+                    if(!visiter.contains(newWord)){
+                        deque.offer(newWord);
+                        visiter.add(newWord);
+                    }
+                }
+            }
+            //还原
+            temp[i]=bak;
+        }
+        return false;
+    }
+
+}
